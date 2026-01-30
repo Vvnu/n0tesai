@@ -13,7 +13,7 @@ export default function DashboardPage() {
       </h1>
 
       <p className="mt-2 text-gray-600">
-        Your personal AI-powered notes workspace.
+        Your personal notes workspace.
       </p>
 
       <div className="mt-8 flex gap-4">
@@ -33,9 +33,9 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-12 rounded border p-6">
-        <h2 className="text-xl font-semibold">AI Assistant</h2>
+        <h2 className="text-xl font-semibold">Station</h2>
         <p className="mt-2 text-gray-500">
-          This is where you’ll ask questions from your notes.
+          DEMO DEMO DEMO DEMO DEMO DEMO
         </p>
       </div>
     </div>

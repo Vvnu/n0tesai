@@ -15,17 +15,14 @@ export default function Navbar() {
 
   return (
     <nav className="flex items-center justify-between border-b px-8 py-4">
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-2 border border-white/10">
-            {/* <p className="text-white/60 text-sm mb-4">Multi-color Letters</p> */}
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl shadow-md border border-white/10 ">
             <a href="/dashboard" className="inline-block">
-              <span className="text-2xl font-bold">
-                <span className="text-purple-400">V</span>
-                <span className="text-pink-400">N</span>
-                <span className="text-yellow-400">0</span>
-                <span className="text-blue-400">t</span>
-                <span className="text-green-400">e</span>
-                <span className="text-red-400">s</span>
-              </span>
+              <div className="inline-flex items-center gap-2 mb-0">
+              <div className="w-8 h-8 bg-linear-to-br from-red-500 to-pink-200 rounded-lg flex items-center justify-center">
+                <img width="30" height="30" src="https://img.icons8.com/doodle-line/60/737373/v.png" alt="v"/>
+              </div>
+              <h1 className="text-2xl font-bold  from-red-400 to-gray-400">N0tes</h1>
+            </div>  
             </a>
           </div>
 
