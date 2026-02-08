@@ -1,8 +1,8 @@
 'use client';
 import { EditorContent, useEditor, Editor } from '@tiptap/react';
-import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
+import { useEffect, useState } from 'react';
 
 type NoteEditorProps = {
   content?: any;
@@ -10,6 +10,9 @@ type NoteEditorProps = {
 };
 
 export default function NoteEditor({ content, onChange }: NoteEditorProps) {
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -21,6 +24,22 @@ export default function NoteEditor({ content, onChange }: NoteEditorProps) {
       onChange?.(editor.getJSON());
       console.log('Editor JSON:', editor.getJSON());
     },
+    onSelectionUpdate({ editor }) {
+      const { from, to } = editor.state.selection;
+      const hasSelection = from !== to;
+      
+      if (hasSelection) {
+        const { view } = editor;
+        const start = view.coordsAtPos(from);
+        setToolbarPosition({
+          top: start.top - 50,
+          left: start.left,
+        });
+        setShowToolbar(true);
+      } else {
+        setShowToolbar(false);
+      }
+    },
   });
 
   if (!editor) return null;
@@ -28,13 +47,14 @@ export default function NoteEditor({ content, onChange }: NoteEditorProps) {
   return (
     <div className="relative">
       {/* Floating Toolbar */}
-      <BubbleMenu
-        editor={editor}
-        shouldShow={({ editor }: { editor: Editor }) =>
-          editor.state.selection.content().size > 0
-        }
-      >
-        <div className="flex gap-1 bg-black text-white rounded-xl px-3 py-2 shadow-lg">
+      {showToolbar && (
+        <div 
+          className="fixed z-50 flex gap-1 bg-black text-white rounded-xl px-3 py-2 shadow-lg"
+          style={{
+            top: `${toolbarPosition.top}px`,
+            left: `${toolbarPosition.left}px`,
+          }}
+        >
           <button 
             className={`px-2 py-1 rounded ${editor.isActive('bold') ? 'bg-white text-black' : 'hover:bg-gray-700'}`}
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -84,17 +104,15 @@ export default function NoteEditor({ content, onChange }: NoteEditorProps) {
             1.
           </button>
         </div>
-      </BubbleMenu>
+      )}
 
       {/* Editor */}
-      {/* Editor */}
-{/* Editor */}
-<div className="prose max-w-none">
-  <EditorContent 
-    editor={editor} 
-    className="[&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:ml-4"
-  />
-</div>
+      <div className="prose max-w-none">
+        <EditorContent 
+          editor={editor} 
+          className="[&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:ml-4"
+        />
+      </div>
     </div>
   );
 }
