@@ -3,16 +3,18 @@
 import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Highlight from '@tiptap/extension-highlight'
-import { useEffect, useState } from 'react'
-import { auth } from '@/lib/firebase'
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { useEffect, useRef, useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { loadNote, saveNote } from '@/lib/notes'
 
 type NoteEditorProps = {
   noteId: string
 }
 
 export default function NoteEditor({ noteId }: NoteEditorProps) {
+  const { user } = useAuth()
+  const saveTimer = useRef<NodeJS.Timeout | null>(null)
+
   const [showToolbar, setShowToolbar] = useState(false)
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 })
 
@@ -22,8 +24,19 @@ export default function NoteEditor({ noteId }: NoteEditorProps) {
     immediatelyRender: false,
 
     onUpdate({ editor }) {
+      if (!user) return
+
       const json = editor.getJSON()
+
+      // ✅ Local cache (instant UX)
       localStorage.setItem(`note:${noteId}`, JSON.stringify(json))
+
+      // ✅ Debounced cloud save
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+
+      saveTimer.current = setTimeout(() => {
+        saveNote(user.uid, noteId, { content: json })
+      }, 800)
     },
 
     onSelectionUpdate({ editor }) {
@@ -38,47 +51,25 @@ export default function NoteEditor({ noteId }: NoteEditorProps) {
     },
   })
 
-  /* 🔁 Load note on mount */
+  /* ================================
+     Load note on mount
+  ================================ */
   useEffect(() => {
-    if (!editor) return
-    const user = auth.currentUser
-    if (!user) return
+    if (!editor || !user) return
 
     const local = localStorage.getItem(`note:${noteId}`)
 
     if (local) {
       editor.commands.setContent(JSON.parse(local))
-    } else {
-      const ref = doc(db, 'users', user.uid, 'notes', noteId)
-      getDoc(ref).then(snap => {
-        if (snap.exists()) {
-          const data = snap.data().content
-          editor.commands.setContent(data)
-          localStorage.setItem(`note:${noteId}`, JSON.stringify(data))
-        }
-      })
+      return
     }
-  }, [editor, noteId])
 
-  /* ☁️ Cloud sync (every 3s) */
-  useEffect(() => {
-    if (!editor) return
-    const user = auth.currentUser
-    if (!user) return
-
-    const interval = setInterval(() => {
-      const json = editor.getJSON()
-      const ref = doc(db, 'users', user.uid, 'notes', noteId)
-
-      setDoc(
-        ref,
-        { content: json, updatedAt: serverTimestamp() },
-        { merge: true }
-      )
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [editor, noteId])
+    loadNote(user.uid, noteId).then(note => {
+      if (!note?.content) return
+      editor.commands.setContent(note.content)
+      localStorage.setItem(`note:${noteId}`, JSON.stringify(note.content))
+    })
+  }, [editor, noteId, user])
 
   if (!editor) return null
 

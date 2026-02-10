@@ -1,10 +1,20 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { createNote } from "@/lib/notes";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const router = useRouter();
+
+  const handleCreateNote = async () => {
+    if (!user) return;
+
+    const docRef = await createNote(user.uid);
+    router.push(`/notes/${docRef.id}`);
+  };
 
   return (
     <div className="min-h-screen p-8">
@@ -17,13 +27,15 @@ export default function DashboardPage() {
       </p>
 
       <div className="mt-8 flex gap-4">
-        <Link
-          href="/notes/new"
+        {/* ✅ REAL create */}
+        <button
+          onClick={handleCreateNote}
           className="rounded bg-black px-6 py-3 text-white"
         >
           Create New Note
-        </Link>
+        </button>
 
+        {/* ✅ Just navigation */}
         <Link
           href="/notes"
           className="rounded border border-black px-6 py-3"
