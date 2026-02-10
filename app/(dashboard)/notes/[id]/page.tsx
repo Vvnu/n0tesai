@@ -1,14 +1,13 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
 import NoteEditor from '@/components/NoteEditor';
 
 export default function NoteEditorPage() {
-  const { noteId } = useParams();
+  const params = useParams();
   const router = useRouter();
 
-  const [content, setContent] = useState<any>(null);
+  const noteId = params.id as string;
 
   return (
     <div className="h-screen flex flex-col">
@@ -26,7 +25,7 @@ export default function NoteEditorPage() {
         </div>
 
         <div className="text-xs text-green-600">
-          Saved
+          Auto-saving
         </div>
       </header>
 
@@ -38,13 +37,8 @@ export default function NoteEditorPage() {
           className="w-full text-3xl font-bold outline-none mb-6"
         />
 
-        <NoteEditor
-          content={content}
-          onChange={(json) => {
-            setContent(json);
-            console.log('Editor content:', json);
-          }}
-        />
+        {/* Editor owns persistence */}
+        <NoteEditor noteId={noteId} />
       </main>
     </div>
   );
