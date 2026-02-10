@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { listenToNotes, createNote } from '@/lib/notes';
+import { listenToNotes, createNote, deleteNote } from '@/lib/notes';
 import { useAuth } from '@/context/AuthContext';
 
 type Note = {
@@ -35,12 +35,22 @@ export default function NotesList() {
     router.push(`/notes/${doc.id}`);
   };
 
+  const handleDelete = async (noteId: string) => {
+    if (!user) return;
+
+    const ok = confirm('Delete this note permanently?');
+    if (!ok) return;
+
+    await deleteNote(user.uid, noteId);
+  };
+
   if (loading) {
     return <p className="text-gray-500">Loading notes…</p>;
   }
 
   return (
     <div className="space-y-4">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Your Notes</h2>
         <button
@@ -51,19 +61,37 @@ export default function NotesList() {
         </button>
       </div>
 
+      {/* Empty State */}
       {notes.length === 0 && (
         <p className="text-gray-500">No notes yet. Create your first one.</p>
       )}
 
+      {/* Notes List */}
       {notes.map(note => (
         <div
           key={note.id}
-          className="cursor-pointer p-4 border rounded-lg hover:bg-gray-50 transition"
-          onClick={() => router.push(`/notes/${note.id}`)}
+          className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition"
         >
-          <h3 className="font-medium">
-            {note.title?.trim() || 'Untitled'}
-          </h3>
+          {/* Open Note */}
+          <div
+            className="cursor-pointer flex-1"
+            onClick={() => router.push(`/notes/${note.id}`)}
+          >
+            <h3 className="font-medium">
+              {note.title?.trim() || 'Untitled'}
+            </h3>
+          </div>
+
+          {/* Delete */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // 🚫 prevent opening note
+              handleDelete(note.id);
+            }}
+            className="ml-3 text-red-500 hover:text-red-700"
+          >
+            🗑
+          </button>
         </div>
       ))}
     </div>

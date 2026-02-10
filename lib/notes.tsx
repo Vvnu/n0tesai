@@ -98,3 +98,21 @@ export function listenToNotes(
     )
   })
 }
+
+
+/* ================================
+   Delete Note
+================================ */
+
+import { deleteDoc } from 'firebase/firestore'
+
+export async function deleteNote(
+  userId: string,
+  noteId: string
+) {
+  const ref = doc(db, 'users', userId, 'notes', noteId)
+  await deleteDoc(ref)
+
+  // local cleanup
+  localStorage.removeItem(`note:${noteId}`)
+}
