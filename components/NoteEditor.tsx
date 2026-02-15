@@ -77,7 +77,7 @@ export default function NoteEditor({ noteId }: NoteEditorProps) {
     <div className="relative">
       {showToolbar && (
         <div
-          className="fixed z-50 flex gap-1 bg-black text-white rounded-xl px-3 py-2 shadow-lg"
+          className="fixed z-50 flex gap-3 bg-black text-white rounded-xl px-3 py-2 shadow-lg"
           style={{ top: toolbarPosition.top, left: toolbarPosition.left }}
         >
           <button onClick={() => editor.chain().focus().toggleBold().run()}>B</button>
@@ -91,11 +91,27 @@ export default function NoteEditor({ noteId }: NoteEditorProps) {
         </div>
       )}
 
-      <div className="prose max-w-none">
+<div className="prose max-w-none w-full">
         <EditorContent
-          editor={editor}
-          className="[&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:ml-4 bg-yellow-100 text-black"
-        />
+  editor={editor}
+  className="
+    w-full
+    min-h-[70vh]
+    bg-gray-500
+    text-black
+    px-6
+    py-4
+    rounded-lg
+    focus:outline-none
+    [&_.ProseMirror]:min-h-[70vh]
+    [&_.ProseMirror]:w-full
+   [&_.ProseMirror::selection]:bg-yellow-300
+[&_.ProseMirror::selection]:text-black
+
+
+  "
+/>
+
       </div>
     </div>
   )

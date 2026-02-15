@@ -70,7 +70,7 @@ export default function NotesList() {
       {notes.map(note => (
         <div
           key={note.id}
-          className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition"
+          className="flex justify-between items-center p-4 border rounded-lg bg-gray-500 hover:bg-gray-50  text-black transition"
         >
           {/* Open Note */}
           <div
