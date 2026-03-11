@@ -10,6 +10,7 @@ import { useAuth } from '@/context/AuthContext'
 import { saveNote } from '@/lib/notes'
 import { saveLocalNote, loadLocalNote } from '@/lib/localNotes'
 import EditorToolbar from './EditorToolbar'
+import { DrawingNode } from './DrawingNode'
 
 type NoteEditorProps = {
   noteId: string
@@ -22,10 +23,7 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
   const saveTimer = useRef<NodeJS.Timeout | null>(null)
   const floatingToolbarRef = useRef<HTMLDivElement>(null)
 
-  /* ================================
-     Floating toolbar logic
-  ================================ */
-  const updateFloatingToolbar = useCallback((editor: ReturnType<typeof useEditor>) => {
+  const updateFloatingToolbar = useCallback((editor: any) => {
     if (!editor || !floatingToolbarRef.current) return
     const { from, to } = editor.state.selection
     if (from !== to) {
@@ -44,14 +42,12 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
     }
   }, [])
 
-  /* ================================
-     Editor setup
-  ================================ */
   const editor = useEditor({
     extensions: [
       StarterKit,
       Highlight.configure({ multicolor: false }),
       Placeholder.configure({ placeholder: 'Start writing…' }),
+      DrawingNode,
     ],
     content: '',
     immediatelyRender: false,
@@ -59,14 +55,9 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
     onUpdate({ editor }) {
       if (!user) return
       const json = editor.getJSON()
-
-      // Notify parent
       onContentChange?.(json)
-
-      // Local cache (instant)
       saveLocalNote(noteId, json)
 
-      // Debounced cloud save
       if (saveTimer.current) clearTimeout(saveTimer.current)
       saveTimer.current = setTimeout(async () => {
         try {
@@ -89,32 +80,20 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
     },
   })
 
-  /* ================================
-     Load content on mount
-  ================================ */
   useEffect(() => {
     if (!editor) return
-
-    // Try local cache first
     const local = loadLocalNote(noteId)
     if (local) {
       editor.commands.setContent(local)
       return
     }
-
-    // Fall back to prop (loaded by parent from Firestore)
     if (initialContent) {
       editor.commands.setContent(initialContent)
     }
   }, [editor, noteId, initialContent])
 
-  /* ================================
-     Cleanup timer on unmount
-  ================================ */
   useEffect(() => {
-    return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current)
-    }
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
   }, [])
 
   if (!editor) return null
@@ -123,9 +102,7 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
     <button
       onMouseDown={e => { e.preventDefault(); action() }}
       className={`px-2 py-0.5 rounded text-sm font-medium transition-colors ${
-        active
-          ? 'bg-white text-black'
-          : 'text-white/80 hover:text-white hover:bg-white/15'
+        active ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/15'
       }`}
     >
       {label}
@@ -160,21 +137,10 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
         <EditorContent
           editor={editor}
           className="
-            w-full
-            min-h-[70vh]
-            bg-white
-            text-gray-900
-            px-6
-            py-4
-            rounded-xl
-            border border-gray-200
-            shadow-sm
-            focus-within:border-gray-400
-            focus-within:shadow-md
-            transition-all
-            [&_.ProseMirror]:min-h-[70vh]
-            [&_.ProseMirror]:w-full
-            [&_.ProseMirror]:outline-none
+            w-full min-h-[70vh] bg-white text-gray-900 px-6 py-4 rounded-xl
+            border border-gray-200 shadow-sm focus-within:border-gray-400
+            focus-within:shadow-md transition-all
+            [&_.ProseMirror]:min-h-[70vh] [&_.ProseMirror]:w-full [&_.ProseMirror]:outline-none
             [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]
             [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400
             [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none

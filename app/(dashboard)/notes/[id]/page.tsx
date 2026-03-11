@@ -7,7 +7,7 @@ import NoteEditor from '@/components/NoteEditor';
 import { loadNote, saveNote } from '@/lib/notes';
 import { useAuth } from '@/context/AuthContext';
 import AiPanel from '@/components/AiPanel';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -25,9 +25,6 @@ export default function NoteEditorPage() {
   const [showAi, setShowAi] = useState(false);
   const titleTimer = useRef<NodeJS.Timeout | null>(null);
 
-  /* ----------------------------
-     Load note (title + content)
-  -----------------------------*/
   useEffect(() => {
     if (!user || !noteId) return;
     loadNote(user.uid, noteId).then(note => {
@@ -39,10 +36,6 @@ export default function NoteEditorPage() {
     });
   }, [user, noteId]);
 
-  /* ----------------------------
-     Auto-save TITLE only
-     Content is saved inside NoteEditor to avoid double-writes
-  -----------------------------*/
   const saveTitle = useCallback(async (newTitle: string) => {
     if (!user || !noteId) return;
     setSaveStatus('saving');
@@ -62,9 +55,6 @@ export default function NoteEditorPage() {
     titleTimer.current = setTimeout(() => saveTitle(val), 600);
   };
 
-  /* ----------------------------
-     Mirror save status from editor
-  -----------------------------*/
   const handleContentChange = useCallback((json: JSONContent) => {
     setContent(json);
     setSaveStatus('saving');
@@ -86,27 +76,19 @@ export default function NoteEditorPage() {
   }
 
   const statusLabel: Record<SaveStatus, string> = {
-    idle: '',
-    saving: 'Saving…',
-    saved: '✓ Saved',
-    error: '⚠ Save failed',
+    idle: '', saving: 'Saving…', saved: '✓ Saved', error: '⚠ Save failed',
   };
-
   const statusColor: Record<SaveStatus, string> = {
-    idle: 'opacity-0',
-    saving: 'text-gray-400 opacity-100',
-    saved: 'text-green-600 opacity-100',
-    error: 'text-red-500 opacity-100',
+    idle: 'opacity-0', saving: 'text-gray-400 opacity-100',
+    saved: 'text-green-600 opacity-100', error: 'text-red-500 opacity-100',
   };
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Top Bar */}
-      <header className="flex items-center justify-between px-6 py-3 border-b bg-white shadow-sm">
-        <button
-          onClick={() => router.push('/notes')}
-          className="text-sm text-gray-500 hover:text-black transition-colors flex items-center gap-1"
-        >
+      <header className="flex items-center justify-between px-3 sm:px-6 py-3 border-b bg-white shadow-sm shrink-0">
+        <button onClick={() => router.push('/notes')}
+          className="text-sm text-gray-500 hover:text-black transition-colors flex items-center gap-1">
           ← Back
         </button>
 
@@ -121,20 +103,23 @@ export default function NoteEditorPage() {
           }`}
         >
           <Sparkles size={14} />
-          AI
+          <span className="hidden sm:inline">AI</span>
+          <span className="sm:hidden">AI</span>
         </button>
       </header>
 
       {/* Main area */}
-      <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-y-auto px-6 py-8">
+      <div className="flex flex-1 overflow-hidden relative">
+
+        {/* Editor */}
+        <main className={`flex-1 overflow-y-auto px-3 sm:px-6 py-6 sm:py-8 transition-all duration-300 ${showAi ? 'sm:mr-0' : ''}`}>
           <div className="max-w-3xl mx-auto">
             <input
               type="text"
               value={title}
               onChange={handleTitleChange}
               placeholder="Untitled"
-              className="w-full text-3xl font-bold outline-none mb-6 bg-transparent text-gray-900 placeholder-gray-300"
+              className="w-full text-2xl sm:text-3xl font-bold outline-none mb-4 sm:mb-6 bg-transparent text-gray-900 placeholder-gray-300"
             />
             <NoteEditor
               noteId={noteId}
@@ -144,10 +129,24 @@ export default function NoteEditorPage() {
           </div>
         </main>
 
+        {/* AI Panel — full screen on mobile, sidebar on desktop */}
         {showAi && (
-          <aside className="w-80 border-l bg-white overflow-y-auto shrink-0">
-            <AiPanel noteContent={content} noteTitle={title} noteId={noteId} />
-          </aside>
+          <div className="
+            fixed inset-0 z-40 bg-white
+            sm:relative sm:inset-auto sm:w-80 sm:border-l sm:bg-white sm:z-auto
+            flex flex-col
+          ">
+            {/* Mobile close button */}
+            <div className="flex items-center justify-between px-4 py-3 border-b sm:hidden">
+              <span className="font-semibold text-gray-700 text-sm">AI Assistant</span>
+              <button onClick={() => setShowAi(false)} className="p-1.5 rounded-lg hover:bg-gray-100">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <AiPanel noteContent={content} noteTitle={title} noteId={noteId} />
+            </div>
+          </div>
         )}
       </div>
     </div>

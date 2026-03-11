@@ -28,33 +28,28 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
         {/* Hero */}
-        <div className="mb-12">
-          {/* <p className="text-sm text-gray-400 font-medium mb-1 uppercase tracking-widest">Dashboard</p> */}
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+        <div className="mb-8 sm:mb-12">
+          <p className="text-xs sm:text-sm text-gray-400 font-medium mb-1 uppercase tracking-widest">Dashboard</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
             {firstName ? `Hello, ${firstName} 👋` : 'Welcome back 👋'}
           </h1>
-          <p className="text-gray-500 text-lg">
+          <p className="text-gray-500 text-base sm:text-lg">
             What would you like to work on today?
           </p>
         </div>
 
         {/* Action cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8 sm:mb-12">
 
-          {/* Create note */}
-          <button
-            onClick={handleCreateNote}
-            disabled={creating}
-            className="group flex flex-col items-start gap-4 p-6 rounded-2xl bg-gray-900 text-white hover:bg-gray-800 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 text-left"
-          >
+          <button onClick={handleCreateNote} disabled={creating}
+            className="group flex flex-col items-start gap-4 p-5 sm:p-6 rounded-2xl bg-gray-900 text-white hover:bg-gray-800 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 text-left">
             <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
               {creating
                 ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                : <PlusCircle size={20} />
-              }
+                : <PlusCircle size={20} />}
             </div>
             <div>
               <div className="font-semibold mb-0.5">New Note</div>
@@ -63,11 +58,8 @@ export default function DashboardPage() {
             <ArrowRight size={16} className="text-white/30 group-hover:text-white/60 group-hover:translate-x-1 transition-all mt-auto" />
           </button>
 
-          {/* View notes */}
-          <Link
-            href="/notes"
-            className="group flex flex-col items-start gap-4 p-6 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all duration-150 text-left"
-          >
+          <Link href="/notes"
+            className="group flex flex-col items-start gap-4 p-5 sm:p-6 rounded-2xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-md active:scale-[0.98] transition-all duration-150">
             <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
               <BookOpen size={20} className="text-gray-700" />
             </div>
@@ -78,8 +70,7 @@ export default function DashboardPage() {
             <ArrowRight size={16} className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all mt-auto" />
           </Link>
 
-          {/* AI hint */}
-          <div className="flex flex-col items-start gap-4 p-6 rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-100">
+          <div className="flex flex-col items-start gap-4 p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-100">
             <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
               <Sparkles size={20} className="text-violet-600" />
             </div>
@@ -87,12 +78,27 @@ export default function DashboardPage() {
               <div className="font-semibold text-gray-900 mb-0.5">AI Features</div>
               <div className="text-gray-500 text-sm">Summarize, continue, chat with any note</div>
             </div>
-            <div className="mt-auto text-xs text-violet-400 font-medium">
-              Open any note → tap AI ✦
-            </div>
+            <div className="mt-auto text-xs text-violet-400 font-medium">Open any note → tap AI ✦</div>
           </div>
         </div>
 
+        {/* Tips */}
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
+          <h2 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">Quick tips</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              { icon: '⌘', tip: 'Select text to reveal the floating format toolbar' },
+              { icon: '✦', tip: 'Tap AI in the note header to open the assistant panel' },
+              { icon: '💾', tip: 'Notes auto-save as you type — no need to press save' },
+              { icon: '🎨', tip: 'Tap Draw in the toolbar to insert a drawing canvas' },
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gap-3 text-sm text-gray-500">
+                <span className="text-base leading-none mt-0.5 shrink-0">{item.icon}</span>
+                <span>{item.tip}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </div>

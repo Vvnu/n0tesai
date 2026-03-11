@@ -18,7 +18,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950 relative overflow-hidden">
+    <div className="flex min-h-screen items-center justify-center bg-gray-950 relative overflow-hidden px-4">
 
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -31,30 +31,30 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
 
       {/* Login card */}
-      <div className="relative z-10 w-full max-w-md mx-4">
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8 md:p-12">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-6 sm:p-8 md:p-12">
 
           {/* Original logo */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center gap-2 mb-3">
               <div className="w-10 h-10 bg-linear-to-br from-purple-500 to-pink-200 rounded-lg flex items-center justify-center">
                 <img width="60" height="60" src="https://img.icons8.com/doodle-line/60/737373/v.png" alt="v"/>
               </div>
-              <h1 className="text-4xl font-bold text-white">N0tes</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">N0tes</h1>
             </div>
             <p className="text-white/70 text-sm">Your intelligent note-taking companion</p>
           </div>
 
           {/* Welcome */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-2">Welcome</h2>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Welcome</h2>
             <p className="text-white/60 text-sm">Sign in to continue to your notes</p>
           </div>
 
           {/* Google Sign In */}
           <button
             onClick={handleLogin}
-            className="w-full bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-800 font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 group"
+            className="w-full bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-800 font-semibold py-3.5 sm:py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 flex items-center justify-center gap-3 group"
           >
             <img
               width="24"
@@ -66,7 +66,7 @@ export default function LoginPage() {
             <span>Continue with Google</span>
           </button>
 
-          <div className="relative my-8">
+          <div className="relative my-6 sm:my-8">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/20" />
             </div>
@@ -78,8 +78,8 @@ export default function LoginPage() {
         </div>
 
         {/* Feature hints */}
-        <div className="flex justify-center gap-6 mt-6">
-          {['Rich text editor', 'AI-powered', 'Auto-sync'].map(f => (
+        <div className="flex justify-center gap-3 sm:gap-6 mt-6 flex-wrap">
+          {['Rich text editor', 'AI-powered', 'Auto-sync', 'Draw & sketch'].map(f => (
             <div key={f} className="flex items-center gap-1.5 text-white/30 text-xs">
               <div className="w-1 h-1 rounded-full bg-purple-400/60" />
               {f}

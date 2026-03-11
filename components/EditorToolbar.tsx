@@ -2,16 +2,8 @@
 
 import { Editor } from '@tiptap/react';
 import {
-  Bold,
-  Italic,
-  Strikethrough,
-  Highlighter,
-  Heading1,
-  Heading2,
-  List,
-  ListOrdered,
-  Code,
-  Quote,
+  Bold, Italic, Strikethrough, Highlighter,
+  Heading1, Heading2, List, ListOrdered, Code, Quote, Pen,
 } from 'lucide-react';
 
 type ToolbarProps = {
@@ -36,39 +28,19 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
 
         {/* Text styles */}
         <div className="flex gap-0.5">
-          <button
-            title="Bold"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={btn(editor.isActive('bold'))}
-          >
+          <button title="Bold" onClick={() => editor.chain().focus().toggleBold().run()} className={btn(editor.isActive('bold'))}>
             <Bold size={15} />
           </button>
-          <button
-            title="Italic"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={btn(editor.isActive('italic'))}
-          >
+          <button title="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} className={btn(editor.isActive('italic'))}>
             <Italic size={15} />
           </button>
-          <button
-            title="Strikethrough"
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={btn(editor.isActive('strike'))}
-          >
+          <button title="Strikethrough" onClick={() => editor.chain().focus().toggleStrike().run()} className={btn(editor.isActive('strike'))}>
             <Strikethrough size={15} />
           </button>
-          <button
-            title="Highlight"
-            onClick={() => editor.chain().focus().toggleHighlight().run()}
-            className={btn(editor.isActive('highlight'))}
-          >
+          <button title="Highlight" onClick={() => editor.chain().focus().toggleHighlight().run()} className={btn(editor.isActive('highlight'))}>
             <Highlighter size={15} />
           </button>
-          <button
-            title="Inline code"
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            className={btn(editor.isActive('code'))}
-          >
+          <button title="Code" onClick={() => editor.chain().focus().toggleCode().run()} className={btn(editor.isActive('code'))}>
             <Code size={15} />
           </button>
         </div>
@@ -77,18 +49,10 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
 
         {/* Headings */}
         <div className="flex gap-0.5">
-          <button
-            title="Heading 1"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={btn(editor.isActive('heading', { level: 1 }))}
-          >
+          <button title="Heading 1" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={btn(editor.isActive('heading', { level: 1 }))}>
             <Heading1 size={15} />
           </button>
-          <button
-            title="Heading 2"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={btn(editor.isActive('heading', { level: 2 }))}
-          >
+          <button title="Heading 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={btn(editor.isActive('heading', { level: 2 }))}>
             <Heading2 size={15} />
           </button>
         </div>
@@ -97,28 +61,28 @@ export default function EditorToolbar({ editor }: ToolbarProps) {
 
         {/* Lists */}
         <div className="flex gap-0.5">
-          <button
-            title="Bullet list"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={btn(editor.isActive('bulletList'))}
-          >
+          <button title="Bullet list" onClick={() => editor.chain().focus().toggleBulletList().run()} className={btn(editor.isActive('bulletList'))}>
             <List size={15} />
           </button>
-          <button
-            title="Ordered list"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={btn(editor.isActive('orderedList'))}
-          >
+          <button title="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={btn(editor.isActive('orderedList'))}>
             <ListOrdered size={15} />
           </button>
-          <button
-            title="Blockquote"
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={btn(editor.isActive('blockquote'))}
-          >
+          <button title="Blockquote" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={btn(editor.isActive('blockquote'))}>
             <Quote size={15} />
           </button>
         </div>
+
+        <Divider />
+
+        {/* Drawing */}
+        <button
+          title="Insert drawing canvas"
+          onClick={() => (editor.chain().focus() as any).insertDrawing().run()}
+          className={`${btn(false)} gap-1.5 px-2.5 text-xs font-medium`}
+        >
+          <Pen size={14} />
+          Draw
+        </button>
 
       </div>
     </div>
