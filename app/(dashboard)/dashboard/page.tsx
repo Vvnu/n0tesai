@@ -70,7 +70,7 @@ export default function DashboardPage() {
             <ArrowRight size={16} className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all mt-auto" />
           </Link>
 
-          <div className="flex flex-col items-start gap-4 p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-100">
+          <div className="flex flex-col items-start gap-4 p-5 sm:p-6 rounded-2xl bg-linear-to-br from-violet-50 to-fuchsia-50 border border-violet-100">
             <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
               <Sparkles size={20} className="text-violet-600" />
             </div>

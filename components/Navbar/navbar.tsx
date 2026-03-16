@@ -66,7 +66,7 @@ export default function Navbar() {
               referrerPolicy="no-referrer"
               className="w-8 h-8 rounded-full border border-gray-200 shadow-sm" />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+            <div className="w-8 h-8 rounded-full `bg-gradient-to-br` from-violet-500 to-fuchsia-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
               {initials}
             </div>
           )}
@@ -85,7 +85,7 @@ export default function Navbar() {
               referrerPolicy="no-referrer"
               className="w-8 h-8 rounded-full border border-gray-200" />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 rounded-full `bg-gradient-to-br` from-violet-500 to-fuchsia-500 flex items-center justify-center text-white text-xs font-bold">
               {initials}
             </div>
           )}

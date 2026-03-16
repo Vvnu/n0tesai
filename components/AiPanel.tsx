@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { getAuth } from 'firebase/auth';
 import { JSONContent } from '@tiptap/core';
 import { Sparkles, Loader2, RefreshCw, Copy, Check } from 'lucide-react';
 
@@ -38,9 +39,17 @@ export default function AiPanel({ noteContent, noteTitle }: AiPanelProps) {
   const noteText = extractText(noteContent);
 
   const callGemini = async (prompt: string): Promise<string> => {
+    // Get real Firebase ID token for server verification
+    const user = getAuth().currentUser;
+    if (!user) throw new Error('Not authenticated');
+    const idToken = await user.getIdToken();
+
     const res = await fetch('/api/ai', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
       body: JSON.stringify({ prompt }),
     });
     if (!res.ok) throw new Error('AI request failed');

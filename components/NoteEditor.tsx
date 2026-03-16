@@ -22,6 +22,7 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
   const { user } = useAuth()
   const saveTimer = useRef<NodeJS.Timeout | null>(null)
   const floatingToolbarRef = useRef<HTMLDivElement>(null)
+  const contentLoaded = useRef(false)
 
   const updateFloatingToolbar = useCallback((editor: any) => {
     if (!editor || !floatingToolbarRef.current) return
@@ -50,6 +51,7 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
       DrawingNode,
     ],
     content: '',
+    // Fix flushSync: defer initial render to avoid React lifecycle conflict
     immediatelyRender: false,
 
     onUpdate({ editor }) {
@@ -80,27 +82,43 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
     },
   })
 
+  // Fix flushSync: use queueMicrotask to defer setContent outside React's render cycle
   useEffect(() => {
-    if (!editor) return
-    const local = loadLocalNote(noteId)
-    if (local) {
-      editor.commands.setContent(local)
-      return
-    }
-    if (initialContent) {
-      editor.commands.setContent(initialContent)
-    }
+    if (!editor || contentLoaded.current) return
+
+    queueMicrotask(() => {
+      if (!editor || editor.isDestroyed) return
+
+      const local = loadLocalNote(noteId)
+      if (local) {
+        editor.commands.setContent(local)
+        contentLoaded.current = true
+        return
+      }
+      if (initialContent) {
+        editor.commands.setContent(initialContent)
+        contentLoaded.current = true
+      }
+    })
   }, [editor, noteId, initialContent])
 
   useEffect(() => {
-    return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
-  }, [])
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+      contentLoaded.current = false
+    }
+  }, [noteId])
 
   if (!editor) return null
 
   const floatingBtn = (label: string, action: () => void, active: boolean) => (
     <button
-      onMouseDown={e => { e.preventDefault(); action() }}
+      // Use onMouseDown + preventDefault to prevent editor losing focus before command runs
+      onMouseDown={e => {
+        e.preventDefault()
+        e.stopPropagation()
+        action()
+      }}
       className={`px-2 py-0.5 rounded text-sm font-medium transition-colors ${
         active ? 'bg-white text-black' : 'text-white/80 hover:text-white hover:bg-white/15'
       }`}
@@ -141,6 +159,18 @@ export default function NoteEditor({ noteId, initialContent, onContentChange }: 
             border border-gray-200 shadow-sm focus-within:border-gray-400
             focus-within:shadow-md transition-all
             [&_.ProseMirror]:min-h-[70vh] [&_.ProseMirror]:w-full [&_.ProseMirror]:outline-none
+            [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mt-6 [&_.ProseMirror_h1]:mb-2
+            [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-semibold [&_.ProseMirror_h2]:mt-5 [&_.ProseMirror_h2]:mb-2
+            [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:my-2
+            [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:my-2
+            [&_.ProseMirror_li]:my-1
+            [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-gray-300
+            [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-gray-500
+            [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_blockquote]:my-4
+            [&_.ProseMirror_code]:bg-gray-100 [&_.ProseMirror_code]:px-1.5 [&_.ProseMirror_code]:py-0.5
+            [&_.ProseMirror_code]:rounded [&_.ProseMirror_code]:text-sm [&_.ProseMirror_code]:font-mono
+            [&_.ProseMirror_pre]:bg-gray-900 [&_.ProseMirror_pre]:text-gray-100
+            [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded-lg [&_.ProseMirror_pre]:my-4
             [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)]
             [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400
             [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none

@@ -18,6 +18,13 @@ export default function NoteEditorPage() {
 
   const noteId = params.id as string;
 
+  // Validate noteId — Firestore IDs are alphanumeric + hyphens only
+  useEffect(() => {
+    if (!noteId || !/^[a-zA-Z0-9_-]+$/.test(noteId)) {
+      router.push('/notes');
+    }
+  }, [noteId, router]);
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState<JSONContent | null>(null);
   const [loading, setLoading] = useState(true);
