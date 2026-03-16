@@ -106,7 +106,7 @@ export default function AiPanel({ noteContent, noteTitle }: AiPanelProps) {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="flex flex-col">
 
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b bg-gray-50 shrink-0">
@@ -131,7 +131,7 @@ export default function AiPanel({ noteContent, noteTitle }: AiPanelProps) {
       </div>
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="flex flex-col gap-3 p-4">
 
         {/* Summarize */}
         {mode === 'summarize' && (

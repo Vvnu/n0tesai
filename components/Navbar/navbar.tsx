@@ -49,7 +49,7 @@ export default function Navbar() {
               <div className="w-8 h-8 bg-linear-to-br from-red-500 to-pink-200 rounded-lg flex items-center justify-center">
                 <img width="30" height="30" src="https://img.icons8.com/doodle-line/60/737373/v.png" alt="v" />
               </div>
-              <h1 className="text-2xl font-bold pr-1">N0tes</h1>
+              <h1 className="text-2xl text-gray-500 font-bold pr-1">N0tes</h1>
             </div>
           </div>
         </Link>

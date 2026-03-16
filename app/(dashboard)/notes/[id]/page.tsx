@@ -129,21 +129,21 @@ export default function NoteEditorPage() {
           </div>
         </main>
 
-        {/* AI Panel — full screen on mobile, sidebar on desktop */}
+        {/* AI Panel - full screen on mobile, sidebar on desktop */}
         {showAi && (
-          <div className="
-            fixed inset-0 z-40 bg-white
-            sm:relative sm:inset-auto sm:w-80 sm:border-l sm:bg-white sm:z-auto
-            flex flex-col
-          ">
-            {/* Mobile close button */}
-            <div className="flex items-center justify-between px-4 py-3 border-b sm:hidden">
+          <div
+            className="fixed inset-0 z-40 bg-white flex flex-col sm:relative sm:inset-auto sm:w-80 sm:border-l sm:z-auto"
+            style={{ height: '100dvh', maxHeight: '100dvh' }}
+          >
+            {/* Mobile close button - pinned at top */}
+            <div className="flex items-center justify-between px-4 py-3 border-b bg-white shrink-0 sm:hidden">
               <span className="font-semibold text-gray-700 text-sm">AI Assistant</span>
               <button onClick={() => setShowAi(false)} className="p-1.5 rounded-lg hover:bg-gray-100">
                 <X size={18} />
               </button>
             </div>
-            <div className="flex-1 overflow-hidden">
+            {/* This div scrolls, AiPanel fills it */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
               <AiPanel noteContent={content} noteTitle={title} noteId={noteId} />
             </div>
           </div>
