@@ -38,24 +38,32 @@ export default function AiPanel({ noteContent, noteTitle }: AiPanelProps) {
 
   const noteText = extractText(noteContent);
 
-  const callGemini = async (prompt: string): Promise<string> => {
-    // Get real Firebase ID token for server verification
-    const user = getAuth().currentUser;
-    if (!user) throw new Error('Not authenticated');
-    const idToken = await user.getIdToken();
+// 1. Update callGemini to handle status codes better
+const callGemini = async (prompt: string): Promise<string> => {
+  const user = getAuth().currentUser;
+  if (!user) throw new Error('Not authenticated');
+  const idToken = await user.getIdToken();
 
-    const res = await fetch('/api/ai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${idToken}`,
-      },
-      body: JSON.stringify({ prompt }),
-    });
-    if (!res.ok) throw new Error('AI request failed');
-    const data = await res.json();
-    return data.result as string;
-  };
+  const res = await fetch('/api/ai', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ prompt }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    // Check specifically for rate limiting
+    if (res.status === 429) {
+       throw new Error('RATE_LIMIT');
+    }
+    throw new Error(data.error || 'AI request failed');
+  }
+  return data.result as string;
+};
 
   const handleSummarize = async () => {
     if (!noteText.trim()) { setError('Note is empty.'); return; }
@@ -74,24 +82,36 @@ export default function AiPanel({ noteContent, noteTitle }: AiPanelProps) {
     } catch { setError('Failed to continue. Try again.'); }
     finally { setLoading(false); }
   };
+const handleChat = async () => {
+  if (!chatInput.trim() || loading) return;
 
-  const handleChat = async () => {
-    if (!chatInput.trim()) return;
-    const userMsg = chatInput.trim();
-    setChatInput('');
-    const newHistory: ChatMessage[] = [...chatHistory, { role: 'user', content: userMsg }];
-    setChatHistory(newHistory);
-    setLoading(true); setError('');
-    try {
-      const context = noteText ? `\n\nNote context (title: "${noteTitle}"):\n${noteText}` : '';
-      const history = newHistory.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n');
-      const reply = await callGemini(`You are a helpful assistant. Answer clearly and directly.${context}\n\nConversation:\n${history}\nAssistant:`);
-      setChatHistory(h => [...h, { role: 'assistant', content: reply }]);
-      setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } catch { setError('Failed to respond. Try again.'); }
-    finally { setLoading(false); }
-  };
+  const userMsg = chatInput.trim();
+  setChatInput('');
+  setLoading(true);
+  setError('');
 
+  try {
+    // Keep history light to avoid hitting the 3.1-lite token limits
+    const recentHistory = chatHistory.slice(-3).map(m => 
+      `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`
+    ).join('\n');
+
+    const fullPrompt = `Context: ${noteText.slice(0, 2000)}\n\n${recentHistory}\nUser: ${userMsg}`;
+    
+    const reply = await callGemini(fullPrompt);
+    
+    setChatHistory(prev => [...prev, 
+      { role: 'user', content: userMsg },
+      { role: 'assistant', content: reply }
+    ]);
+  } catch (err: any) {
+    // If it fails, let the user try again
+    setChatInput(userMsg); 
+    setError(err.message === 'RATE_LIMIT' ? 'Rate limit hit. Wait 10s.' : 'Failed to connect.');
+  } finally {
+    setLoading(false);
+  }
+};
   const handleGenerate = async () => {
     if (!generatePrompt.trim()) { setError('Enter a prompt.'); return; }
     setLoading(true); setError(''); setResult('');
